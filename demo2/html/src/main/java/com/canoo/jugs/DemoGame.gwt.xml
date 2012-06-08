@@ -1,0 +1,10 @@
+<module rename-to='demo'>
+  <inherits name='playn.PlayN'/>
+
+  <source path='core'/>
+  <source path='html'/>
+
+  <public path="resources" />
+
+  <entry-point class='com.canoo.jugs.html.DemoGameHtml'/>
+</module>
