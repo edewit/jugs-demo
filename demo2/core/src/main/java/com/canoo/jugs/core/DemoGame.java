@@ -49,8 +49,8 @@ public class DemoGame implements Game {
         });
 
         // size of world
-        int width = 30;
-        int height = 19;
+        int width = 29;
+        int height = 20;
 
         // create the physics world
         Vec2 gravity = new Vec2(0.0f, 10.0f);
@@ -67,7 +67,7 @@ public class DemoGame implements Game {
         // create the walls
         Body wallLeft = world.createBody(new BodyDef());
         PolygonShape wallLeftShape = new PolygonShape();
-        wallLeftShape.setAsEdge(new Vec2(0, 0), new Vec2(0, height));
+        wallLeftShape.setAsEdge(new Vec2(0, 0), new Vec2(1, height));
         wallLeft.createFixture(wallLeftShape, 0.0f);
         Body wallRight = world.createBody(new BodyDef());
         PolygonShape wallRightShape = new PolygonShape();

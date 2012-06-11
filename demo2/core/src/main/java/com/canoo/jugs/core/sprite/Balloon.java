@@ -8,6 +8,7 @@ import playn.core.ResourceCallback;
 
 import static com.canoo.jugs.core.DemoGame.*;
 import static playn.core.PlayN.log;
+import static playn.core.PlayN.random;
 
 /**
  * @author edewit
@@ -61,14 +62,15 @@ public class Balloon {
         Body body = world.createBody(bodyDef);
 
         CircleShape circleShape = new CircleShape();
-        circleShape.m_radius = 0.5f;
+        circleShape.m_radius = 1.5f;
         fixtureDef.shape = circleShape;
         fixtureDef.density = 0.4f;
         fixtureDef.friction = 0.1f;
-        fixtureDef.restitution = 0.35f;
+        fixtureDef.restitution = 0.95f;
         circleShape.m_p.set(0, 0);
         body.createFixture(fixtureDef);
-        body.setLinearDamping(0.2f);
+        //body.setLinearDamping(0.2f);
+        body.setLinearVelocity(new Vec2(random() * 20 + 1, 1));
         body.setTransform(new Vec2(x, y), 0);
         return body;
     }
