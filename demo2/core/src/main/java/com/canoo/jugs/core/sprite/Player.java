@@ -58,7 +58,7 @@ public class Player {
         step = (step + delta) % 150;
         if (step == 0) {
             step = 0;
-            spriteIndex = (spriteIndex + 1) % sprite.numSprites();
+            spriteIndex = (spriteIndex + 1) % (sprite.numSprites() - 1);
             sprite.setSprite(spriteIndex);
         }
     }
@@ -80,6 +80,7 @@ public class Player {
     }
 
     public void stop() {
+        sprite.setSprite(5);
         direction = 0;
     }
 }
