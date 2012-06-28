@@ -12,85 +12,101 @@ import playn.core.*;
 import static playn.core.PlayN.*;
 
 public class DemoGame implements Game {
-    public static float physUnitPerScreenUnit = 1 / 26.666667f;
-    private Player player;
-    private World world;
-    private Balloon balloon;
+   public static float physUnitPerScreenUnit = 1 / 26.666667f;
+   private Player player;
+   private World world;
+   private Balloon balloon;
 
-    @Override
-    public void init() {
-        graphics().setSize(798, 595);
-        GroupLayer layer = graphics().createGroupLayer();
-        graphics().rootLayer().add(layer);
+   @Override
+   public void init() {
+      graphics().setSize(798, 595);
+      GroupLayer layer = graphics().createGroupLayer();
+      graphics().rootLayer().add(layer);
 
-        Image bgImage = assets().getImage("images/bg.png");
-        ImageLayer bgLayer = graphics().createImageLayer(bgImage);
-        layer.add(bgLayer);
+      Image bgImage = assets().getImage("images/bg.png");
+      ImageLayer bgLayer = graphics().createImageLayer(bgImage);
+      layer.add(bgLayer);
 
-        player = new Player(layer, 100, 523);
+      player = new Player(layer, 100, 523);
 
-        keyboard().setListener(new Keyboard.Adapter() {
-            @Override
-            public void onKeyDown(Keyboard.Event event) {
-                switch (event.key()) {
-                    case LEFT:
-                        player.moveLeft();
-                        break;
-                    case RIGHT:
-                        player.moveRight();
-                        break;
-                }
+      keyboard().setListener(new Keyboard.Adapter() {
+         @Override
+         public void onKeyDown(Keyboard.Event event) {
+            switch (event.key()) {
+               case LEFT:
+                  player.moveLeft();
+                  break;
+               case RIGHT:
+                  player.moveRight();
+                  break;
             }
+         }
 
-            @Override
-            public void onKeyUp(Keyboard.Event event) {
-                player.stop();
+         @Override
+         public void onKeyUp(Keyboard.Event event) {
+            player.stop();
+         }
+      });
+
+      pointer().setListener(new Pointer.Adapter() {
+         @Override
+         public void onPointerStart(Pointer.Event event) {
+            if (event.x() > player.x()) {
+               player.moveRight();
+            } else {
+               player.moveLeft();
             }
-        });
+         }
 
-        // size of world
-        int width = 29;
-        int height = 20;
+         @Override
+         public void onPointerEnd(Pointer.Event event) {
+            player.stop();
+         }
+      });
 
-        // create the physics world
-        Vec2 gravity = new Vec2(0.0f, 10.0f);
-        world = new World(gravity, true);
-        world.setWarmStarting(true);
-        world.setAutoClearForces(true);
+      // size of world
+      int width = 29;
+      int height = 20;
 
-        // create the ground
-        Body ground = world.createBody(new BodyDef());
-        PolygonShape groundShape = new PolygonShape();
-        groundShape.setAsEdge(new Vec2(0, height), new Vec2(width, height));
-        ground.createFixture(groundShape, 0.0f);
+      // create the physics world
+      Vec2 gravity = new Vec2(0.0f, 10.0f);
+      world = new World(gravity, true);
+      world.setWarmStarting(true);
+      world.setAutoClearForces(true);
 
-        // create the walls
-        Body wallLeft = world.createBody(new BodyDef());
-        PolygonShape wallLeftShape = new PolygonShape();
-        wallLeftShape.setAsEdge(new Vec2(0, 0), new Vec2(1, height));
-        wallLeft.createFixture(wallLeftShape, 0.0f);
-        Body wallRight = world.createBody(new BodyDef());
-        PolygonShape wallRightShape = new PolygonShape();
-        wallRightShape.setAsEdge(new Vec2(width, 0), new Vec2(width, height));
-        wallRight.createFixture(wallRightShape, 0.0f);
+      // create the ground
+      Body ground = world.createBody(new BodyDef());
+      PolygonShape groundShape = new PolygonShape();
+      groundShape.setAsEdge(new Vec2(0, height), new Vec2(width, height));
+      ground.createFixture(groundShape, 0.0f);
 
-        balloon = new Balloon(layer, world, 100 * physUnitPerScreenUnit, 20 * physUnitPerScreenUnit);
-    }
+      // create the walls
+      Body wallLeft = world.createBody(new BodyDef());
+      PolygonShape wallLeftShape = new PolygonShape();
+      wallLeftShape.setAsEdge(new Vec2(0, 0), new Vec2(1, height));
+      wallLeft.createFixture(wallLeftShape, 0.0f);
+      Body wallRight = world.createBody(new BodyDef());
+      PolygonShape wallRightShape = new PolygonShape();
+      wallRightShape.setAsEdge(new Vec2(width, 0), new Vec2(width, height));
+      wallRight.createFixture(wallRightShape, 0.0f);
 
-    @Override
-    public void paint(float alpha) {
-        balloon.paint(alpha);
-    }
+      balloon = new Balloon(layer, world, 100 * physUnitPerScreenUnit, 20 * physUnitPerScreenUnit);
+   }
 
-    @Override
-    public void update(float delta) {
-        player.update(delta);
-        world.step(0.033f, 10, 10);
-        balloon.update(delta);
-    }
+   @Override
+   public void paint(float alpha) {
+      balloon.paint(alpha);
+   }
 
-    @Override
-    public int updateRate() {
-        return 25;
-    }
+   @Override
+   public void update(float delta) {
+      player.update(delta);
+      world.step(0.033f, 10, 10);
+      balloon.update(delta);
+   }
+
+   @Override
+   public int updateRate() {
+      return 25;
+   }
 }
