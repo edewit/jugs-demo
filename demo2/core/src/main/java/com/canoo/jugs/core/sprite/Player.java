@@ -1,5 +1,7 @@
 package com.canoo.jugs.core.sprite;
 
+import com.canoo.jugs.core.DemoGame;
+import org.jbox2d.dynamics.World;
 import playn.core.GroupLayer;
 import playn.core.ResourceCallback;
 
@@ -21,9 +23,15 @@ public class Player {
    private float facing = 1;
    private float x, y;
 
-   public Player(final GroupLayer groupLayer, final float x, final float y) {
+   private World world;
+   private Rope rope;
+   private GroupLayer groupLayer;
+
+   public Player(final GroupLayer groupLayer, World world, final float x, final float y) {
       sprite = SpriteLoader.getSprite(IMAGE, JSON);
 
+      this.world = world;
+      this.groupLayer = groupLayer;
       this.x = x;
       this.y = y;
 
@@ -33,6 +41,7 @@ public class Player {
             sprite.setSprite(spriteIndex);
             sprite.layer().setOrigin(sprite.width() / 2f, sprite.height());
             sprite.layer().setTranslation(x, y);
+            sprite.layer().setDepth(99);
             groupLayer.add(sprite.layer());
             hasLoaded = true;
          }
@@ -44,6 +53,12 @@ public class Player {
       });
    }
 
+   public void paint(float alpha) {
+      if (rope != null) {
+         rope.paint(alpha);
+      }
+   }
+
    public void update(float delta) {
       if (hasLoaded) {
          if (direction != 0) {
@@ -51,6 +66,10 @@ public class Player {
             x += direction * delta / 3;
             sprite.layer().setTranslation(x, y);
          }
+      }
+
+      if (rope != null) {
+         rope.update(delta);
       }
    }
 
@@ -61,6 +80,10 @@ public class Player {
          spriteIndex = (spriteIndex + 1) % (sprite.numSprites() - 1);
          sprite.setSprite(spriteIndex);
       }
+   }
+
+   public void shoot() {
+      rope = new Rope(groupLayer, world, x * DemoGame.physUnitPerScreenUnit, y * DemoGame.physUnitPerScreenUnit);
    }
 
    public void moveRight() {
@@ -90,5 +113,9 @@ public class Player {
 
    public float x() {
       return x;
+   }
+
+   public Rope getRope() {
+      return rope;
    }
 }

@@ -2,12 +2,20 @@ package com.canoo.jugs.core;
 
 import com.canoo.jugs.core.sprite.Balloon;
 import com.canoo.jugs.core.sprite.Player;
+import com.canoo.jugs.core.sprite.Rope;
+import org.jbox2d.callbacks.ContactImpulse;
+import org.jbox2d.callbacks.ContactListener;
+import org.jbox2d.callbacks.DebugDraw;
+import org.jbox2d.collision.Manifold;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.World;
+import org.jbox2d.dynamics.contacts.Contact;
 import playn.core.*;
+
+import java.util.Stack;
 
 import static playn.core.PlayN.*;
 
@@ -16,6 +24,10 @@ public class DemoGame implements Game {
    private Player player;
    private World world;
    private Balloon balloon;
+   private Stack<Contact> contacts = new Stack<Contact>();
+
+   private static boolean showDebugDraw = false;
+   private DebugDrawBox2D debugDraw;
 
    @Override
    public void init() {
@@ -27,7 +39,34 @@ public class DemoGame implements Game {
       ImageLayer bgLayer = graphics().createImageLayer(bgImage);
       layer.add(bgLayer);
 
-      player = new Player(layer, 100, 523);
+      // size of world
+      int width = 29;
+      int height = 20;
+
+      // create the physics world
+      Vec2 gravity = new Vec2(0.0f, 10.0f);
+      world = new World(gravity, true);
+
+
+      if (showDebugDraw) {
+         CanvasImage image = graphics().createImage(798, 595);
+         graphics().rootLayer().add(graphics().createImageLayer(image));
+         debugDraw = new DebugDrawBox2D();
+         debugDraw.setCanvas(image);
+         debugDraw.setFlipY(false);
+         debugDraw.setStrokeAlpha(150);
+         debugDraw.setFillAlpha(75);
+         debugDraw.setStrokeWidth(2.0f);
+         debugDraw.setFlags(DebugDraw.e_shapeBit | DebugDraw.e_jointBit | DebugDraw.e_aabbBit);
+         debugDraw.setCamera(0, 0, 1f / physUnitPerScreenUnit);
+         world.setDebugDraw(debugDraw);
+      }
+
+
+      world.setWarmStarting(true);
+      world.setAutoClearForces(true);
+
+      player = new Player(layer, world, 100, 523);
 
       keyboard().setListener(new Keyboard.Adapter() {
          @Override
@@ -38,6 +77,9 @@ public class DemoGame implements Game {
                   break;
                case RIGHT:
                   player.moveRight();
+                  break;
+               case SPACE:
+                  player.shoot();
                   break;
             }
          }
@@ -64,21 +106,33 @@ public class DemoGame implements Game {
          }
       });
 
-      // size of world
-      int width = 29;
-      int height = 20;
-
-      // create the physics world
-      Vec2 gravity = new Vec2(0.0f, 10.0f);
-      world = new World(gravity, true);
-      world.setWarmStarting(true);
-      world.setAutoClearForces(true);
-
       // create the ground
       Body ground = world.createBody(new BodyDef());
       PolygonShape groundShape = new PolygonShape();
       groundShape.setAsEdge(new Vec2(0, height), new Vec2(width, height));
       ground.createFixture(groundShape, 0.0f);
+
+      world.setContactListener(new ContactListener() {
+         @Override
+         public void beginContact(Contact contact) {
+            contacts.push(contact);
+         }
+
+         @Override
+         public void endContact(Contact contact) {
+
+         }
+
+         @Override
+         public void preSolve(Contact contact, Manifold oldManifold) {
+
+         }
+
+         @Override
+         public void postSolve(Contact contact, ContactImpulse impulse) {
+
+         }
+      });
 
       // create the walls
       Body wallLeft = world.createBody(new BodyDef());
@@ -96,10 +150,17 @@ public class DemoGame implements Game {
    @Override
    public void paint(float alpha) {
       balloon.paint(alpha);
+      player.paint(alpha);
+
+      if (showDebugDraw) {
+         debugDraw.getCanvas().clear();
+         world.drawDebugData();
+      }
    }
 
    @Override
    public void update(float delta) {
+      processContacts();
       player.update(delta);
       world.step(0.033f, 10, 10);
       balloon.update(delta);
@@ -109,4 +170,22 @@ public class DemoGame implements Game {
    public int updateRate() {
       return 25;
    }
+
+   public void processContacts() {
+      while (!contacts.isEmpty()) {
+         Contact contact = contacts.pop();
+
+         final Body body1 = contact.getFixtureA().getBody();
+         final Body body2 = contact.getFixtureB().getBody();
+
+         final Rope rope = player.getRope();
+         if (rope != null) {
+            if ((body1.equals(balloon.getBody()) || body2.equals(balloon.getBody()))
+                    && (body1.equals(rope.getBody()) || body2.equals(rope.getBody()))) {
+               balloon.pang();
+            }
+         }
+      }
+   }
+
 }
