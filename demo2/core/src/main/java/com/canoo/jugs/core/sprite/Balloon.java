@@ -16,8 +16,10 @@ public class Balloon extends AbstractSprite {
 
    private static final String JSON = "balloon.json";
    private static final String IMAGE = "images/balloon.png";
+
    private int spriteIndex = 1;
    private boolean animateDeath;
+   private int time;
 
    public Balloon(final GroupLayer layer, World world, final float x, final float y) {
       super(x, y, world);
@@ -40,12 +42,13 @@ public class Balloon extends AbstractSprite {
       });
    }
 
-   private int time;
    @Override
    public void update(float delta) {
       super.update(delta);
       time += delta;
-      if (spriteIndex < sprite.numSprites() && animateDeath && time % 150 == 0) {
+      if (spriteIndex >= sprite.numSprites()) {
+         sprite.layer().destroy();
+      } else if (animateDeath && time % (delta * 5) == 0) {
          sprite.setSprite(spriteIndex++);
       }
    }
