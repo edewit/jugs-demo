@@ -39,6 +39,12 @@ public class DemoGame implements Game {
       ImageLayer bgLayer = graphics().createImageLayer(bgImage);
       layer.add(bgLayer);
 
+      Image bgImageOverlay = assets().getImage("images/bg-overlay.png");
+      ImageLayer bgLayerOverlay = graphics().createImageLayer(bgImageOverlay);
+      bgLayerOverlay.setTranslation(0, 595 - 84);
+      bgLayerOverlay.setDepth(2);
+      layer.add(bgLayerOverlay);
+
       // size of world
       int width = 29;
       int height = 20;
@@ -61,7 +67,6 @@ public class DemoGame implements Game {
          debugDraw.setCamera(0, 0, 1f / physUnitPerScreenUnit);
          world.setDebugDraw(debugDraw);
       }
-
 
       world.setWarmStarting(true);
       world.setAutoClearForces(true);

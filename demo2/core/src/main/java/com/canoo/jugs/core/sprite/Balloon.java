@@ -31,7 +31,7 @@ public class Balloon extends AbstractSprite {
             sprite.setSprite(0);
             setPosition(x, y);
             sprite.layer().setOrigin(sprite.width() / 2f, sprite.height() / 2f);
-            sprite.layer().setDepth(1);
+            sprite.layer().setDepth(3);
             layer.add(sprite.layer());
          }
 
