@@ -98,7 +98,9 @@ public class DemoGame implements Game {
       pointer().setListener(new Pointer.Adapter() {
          @Override
          public void onPointerStart(Pointer.Event event) {
-            if (event.x() > player.x()) {
+            if (event.y() < player.y()) {
+               player.shoot();
+            } else if (event.x() > player.x()) {
                player.moveRight();
             } else {
                player.moveLeft();
