@@ -55,7 +55,7 @@ public class Rope extends AbstractSprite {
 
       PolygonShape shape = new PolygonShape();
       //TODO seems a bit hard coded ;)
-      shape.setAsBox(0.1f, 7);
+      shape.setAsBox(0.1f, 9);
       fixtureDef.shape = shape;
       body.createFixture(fixtureDef);
       body.setLinearVelocity(new Vec2(0, -10));
